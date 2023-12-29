@@ -61,7 +61,9 @@ class FirstFragment : Fragment() {
 
         val clientId = getString(R.string.server_client_id_web)
         val gso: GoogleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(clientId)
+            .requestScopes( Scope(Scopes.DRIVE_APPFOLDER)) //todo need to explore all option to chose correct one finally DRIVE_APPFOLDER
+            .requestServerAuthCode(clientId)
+//            .requestIdToken(clientId)
             .requestEmail()
             .build()
 
@@ -71,7 +73,7 @@ class FirstFragment : Fragment() {
         val signInIntent: Intent = mGoogleSignInClient.getSignInIntent()
         signInLauncherIntent.launch(signInIntent)
 //
-        Log.w(tag, "clientId:::: $clientId" )
+        Log.w(tag, "clientId 1111:::: $clientId" )
     }
     private val signInLauncherIntent = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -96,12 +98,15 @@ class FirstFragment : Fragment() {
 
     private fun updateUI(account : GoogleSignInAccount){
         try {
-            val idToken = account.idToken
+            //  NOTE  if requestIdToken used in GoogleSignInOptions then use account.idToken
+//            and if requestServerAuthCode used in GoogleSignInOptions then  get value in  account.getServerAuthCode   not in idToken
+//            val idToken = account.getServerAuthCode()
+            val idToken = account.getServerAuthCode()
             account.email
 
             Log.d(tag,"handleSignInResult()        account.id :: ${       account.id}         account.email ${ account.email }     account.account  ${   account.account}")
             Log.d(tag,"handleSignInResult() idToken : $idToken")
-            Toast.makeText(requireContext(),"idToken 222 $idToken",Toast.LENGTH_LONG).show()
+            Toast.makeText(requireContext(),"idToken 555 $idToken",Toast.LENGTH_LONG).show()
         } catch (e: Exception) {
             Toast.makeText(requireContext(),"Exception 222 :  ${e.cause}",Toast.LENGTH_LONG).show()
             Log.w(tag, "Exception :error", e)
