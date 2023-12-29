@@ -1,21 +1,25 @@
 package com.example.googlesigninsample
 
+import android.R.attr.data
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.navigation.fragment.findNavController
+import androidx.fragment.app.Fragment
 import com.example.googlesigninsample.databinding.FragmentFirstBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.Scopes
 import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.Scope
 import com.google.android.gms.tasks.Task
+
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -61,15 +65,13 @@ class FirstFragment : Fragment() {
             .requestEmail()
             .build()
 
-        // Build a GoogleSignInClient with the options specified by gso.
+
         val mGoogleSignInClient = GoogleSignIn.getClient(requireActivity(), gso);
 
         val signInIntent: Intent = mGoogleSignInClient.getSignInIntent()
         signInLauncherIntent.launch(signInIntent)
-
+//
         Log.w(tag, "clientId:::: $clientId" )
-
-
     }
     private val signInLauncherIntent = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -84,13 +86,25 @@ class FirstFragment : Fragment() {
     private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
         try {
             val account = completedTask.getResult(ApiException::class.java)
-            val idToken = account.idToken
-
-            Log.d(tag,"handleSignInResult() account :: $account")
-            Log.d(tag,"handleSignInResult() idToken : $idToken")
-
+            updateUI(account)
         } catch (e: ApiException) {
+            Toast.makeText(requireContext(),"Exception 111 :  ${e.cause}",Toast.LENGTH_LONG).show()
             Log.w(tag, "handleSignInResult:error", e)
+        }
+    }
+
+
+    private fun updateUI(account : GoogleSignInAccount){
+        try {
+            val idToken = account.idToken
+            account.email
+
+            Log.d(tag,"handleSignInResult()        account.id :: ${       account.id}         account.email ${ account.email }     account.account  ${   account.account}")
+            Log.d(tag,"handleSignInResult() idToken : $idToken")
+            Toast.makeText(requireContext(),"idToken 222 $idToken",Toast.LENGTH_LONG).show()
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(),"Exception 222 :  ${e.cause}",Toast.LENGTH_LONG).show()
+            Log.w(tag, "Exception :error", e)
         }
     }
 
