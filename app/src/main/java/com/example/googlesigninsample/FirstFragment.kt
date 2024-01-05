@@ -63,7 +63,8 @@ class FirstFragment : Fragment() {
         val gso: GoogleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestScopes( Scope(Scopes.DRIVE_APPFOLDER)) //todo need to explore all option to chose correct one finally DRIVE_APPFOLDER
             .requestServerAuthCode(clientId)
-//            .requestIdToken(clientId)
+            .requestIdToken(clientId)
+            .requestScopes(Scope("https://www.googleapis.com/auth/gmail.readonly"))
             .requestEmail()
             .build()
 
@@ -101,17 +102,39 @@ class FirstFragment : Fragment() {
             //  NOTE  if requestIdToken used in GoogleSignInOptions then use account.idToken
 //            and if requestServerAuthCode used in GoogleSignInOptions then  get value in  account.getServerAuthCode   not in idToken
 //            val idToken = account.getServerAuthCode()
-            val idToken = account.getServerAuthCode()
+            val idToken = account.idToken
+            val servercode = account.getServerAuthCode()
             account.email
 
             Log.d(tag,"handleSignInResult()        account.id :: ${       account.id}         account.email ${ account.email }     account.account  ${   account.account}")
             Log.d(tag,"handleSignInResult() idToken : $idToken")
+            Log.d(tag,"handleSignInResult() servercode : $servercode ")
             Toast.makeText(requireContext(),"idToken 555 $idToken",Toast.LENGTH_LONG).show()
+
+
+            val shareMessage = "Id Token :\n\n$idToken \n\n Server Auth Code :\n\n$servercode"
+            try {
+                val sendIntent: Intent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    putExtra(Intent.EXTRA_TEXT, shareMessage)
+                    type = "text/plain"
+                }
+
+                val shareIntent = Intent.createChooser(sendIntent, null)
+                activity?.startActivity(shareIntent)
+            } catch (ignored: Exception) {
+                Log.e(tag, "Exception handleSignInResult:error ${ignored.message}")
+                    ignored.printStackTrace()
+
+            }
         } catch (e: Exception) {
             Toast.makeText(requireContext(),"Exception 222 :  ${e.cause}",Toast.LENGTH_LONG).show()
             Log.w(tag, "Exception :error", e)
         }
     }
+
+
+
 
 
 
