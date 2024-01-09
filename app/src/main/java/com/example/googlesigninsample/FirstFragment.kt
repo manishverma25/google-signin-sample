@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
+import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import com.example.googlesigninsample.databinding.FragmentFirstBinding
@@ -24,7 +25,7 @@ import com.google.android.gms.tasks.Task
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
-class FirstFragment : Fragment() {
+class FirstFragment : Fragment(), CredentialSignInManager.Callback {
 
     private var _binding: FragmentFirstBinding? = null
 
@@ -33,6 +34,7 @@ class FirstFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val tag ="GOOGLE_SIGN_IN"
+    private var identitySignInManager: GoogleIdentitySignInManager? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,8 +53,14 @@ class FirstFragment : Fragment() {
 //            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
 //            googleSignInSample()
             activity?.let {
-                val credentialSignInManager = CredentialSignInManager(it)
+                val credentialSignInManager = CredentialSignInManager(it,this)
                 credentialSignInManager.googleSignInWithCredentialManager()
+
+                //            googleSignInSample()
+//            startCredentialManagerSignIn()
+//                startGoogleIdentitySignIn()
+
+//            requestGmailReadOnlyAuthorization()
             }
         }
     }
@@ -141,9 +149,48 @@ class FirstFragment : Fragment() {
 
 
 
+    private fun startGoogleIdentitySignIn() {
+        activity?.let {
+            identitySignInManager = GoogleIdentitySignInManager(it)
+            identitySignInManager?.requestSignIn(identitySignInResultIntentSenderLauncher)
+        }
+    }
+
+    private fun requestGmailReadOnlyAuthorization() {
+        activity?.let {
+            identitySignInManager = GoogleIdentitySignInManager(it)
+            identitySignInManager?.requestGmailReadOnlyAccess(dataAccessAuthorizationLauncher)
+        }
+    }
+
+    private val identitySignInResultIntentSenderLauncher =
+        registerForActivityResult<IntentSenderRequest, ActivityResult>(
+            ActivityResultContracts.StartIntentSenderForResult()
+        ) { result: ActivityResult ->
+            identitySignInManager?.handleSignInResult(result, dataAccessAuthorizationLauncher)
+        }
+
+    private val dataAccessAuthorizationLauncher =
+        registerForActivityResult<IntentSenderRequest, ActivityResult>(
+            ActivityResultContracts.StartIntentSenderForResult()
+        ) { result: ActivityResult ->
+            identitySignInManager?.handleAuthorizationResult(result)
+        }
+
+
+
+
+
+
+
+
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onSignInSuccess() {
+          requestGmailReadOnlyAuthorization()
     }
 }
