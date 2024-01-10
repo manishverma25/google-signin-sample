@@ -25,7 +25,8 @@ class GoogleIdentitySignInManager(private val activity: FragmentActivity?) {
         Log.d(TAG, "requestSignIn() called()")
         activity?.let {
             val request = GetSignInIntentRequest.builder()
-                .setServerClientId(it.resources.getString(R.string.server_client_id_web)).build()
+                .setServerClientId(it.resources.getString(R.string.server_client_id_web))
+                .build()
             Identity.getSignInClient(activity).getSignInIntent(request)
                 .addOnSuccessListener { result ->
                     Log.d(TAG, "OnSuccessListener() result : $result")
@@ -72,10 +73,13 @@ class GoogleIdentitySignInManager(private val activity: FragmentActivity?) {
         Log.d(TAG, "requestGmailReadOnlyAccess  called()")
         activity?.let {
             val scopeReadOnly = Scope("https://www.googleapis.com/auth/gmail.readonly")
+
+            val clientId = activity.resources.getString(R.string.server_client_id_web)
             val requestedScopes = listOf(scopeReadOnly)
             val authorizationRequest =
                 AuthorizationRequest.builder()
                     .setRequestedScopes(requestedScopes)
+                    .requestOfflineAccess(clientId) // added it  to get  authorizationResult.serverAuthCode otherwise it was null
                     .build()
             Identity.getAuthorizationClient(it)
                 .authorize(authorizationRequest)
@@ -101,6 +105,14 @@ class GoogleIdentitySignInManager(private val activity: FragmentActivity?) {
                         Log.d(
                             TAG,
                             "Access already granted, continue with user action : ",
+                        )
+                        Log.d(
+                            TAG,
+                            " >>> authorizationResult  authorizationResult.accessToken  : ${   authorizationResult.accessToken}",
+                        )
+                        Log.d(
+                            TAG,
+                            "  >>>333  authorizationResult    authorizationResult.serverAuthCode : ${    authorizationResult.serverAuthCode}",
                         )
                     }
                 }.addOnFailureListener { e: Exception ->
