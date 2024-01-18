@@ -12,6 +12,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.googlesigninsample.databinding.FragmentFirstBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -50,18 +51,19 @@ class FirstFragment : Fragment(), CredentialSignInManager.Callback {
         super.onViewCreated(view, savedInstanceState)
 
         binding.buttonFirst.setOnClickListener {
-//            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+
 //            googleSignInSample()
-            activity?.let {
-                val credentialSignInManager = CredentialSignInManager(it,this)
-                credentialSignInManager.googleSignInWithCredentialManager()
+//            activity?.let {
+//                val credentialSignInManager = CredentialSignInManager(it,this)
+//                credentialSignInManager.googleSignInWithCredentialManager()
 
                 //            googleSignInSample()
 //            startCredentialManagerSignIn()
 //                startGoogleIdentitySignIn()
 
 //            requestGmailReadOnlyAuthorization()
-            }
+//            }
         }
     }
 
